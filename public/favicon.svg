@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a1f3a"/>
+      <stop offset="100%" stop-color="#0d1020"/>
+    </linearGradient>
+    <linearGradient id="letterA" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c8cdd8"/>
+      <stop offset="60%" stop-color="#a0a8b8"/>
+      <stop offset="100%" stop-color="#b066f5"/>
+    </linearGradient>
+    <linearGradient id="letterK" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#b066f5"/>
+      <stop offset="100%" stop-color="#cc88ff"/>
+    </linearGradient>
+  </defs>
+
+  <!-- fundo arredondado -->
+  <rect width="32" height="32" rx="7" ry="7" fill="url(#bg)"/>
+
+  <!-- letra A -->
+  <text
+    x="5"
+    y="23"
+    font-family="'Arial Black', Arial, sans-serif"
+    font-weight="900"
+    font-size="17"
+    fill="url(#letterA)"
+    letter-spacing="-1"
+  >A</text>
+
+  <!-- letra K -->
+  <text
+    x="17"
+    y="23"
+    font-family="'Arial Black', Arial, sans-serif"
+    font-weight="900"
+    font-size="17"
+    fill="url(#letterK)"
+    letter-spacing="0"
+  >K</text>
+</svg>
