@@ -1,4 +1,4 @@
-import { MessageCircle, ArrowRight, MapPin } from "lucide-react";
+import { ArrowRight, MapPin } from "lucide-react";
 
 export const Hero = () => {
   return (
@@ -30,17 +30,8 @@ export const Hero = () => {
 
           <div className="mt-10 flex flex-col sm:flex-row gap-3">
             <a
-              href="https://wa.me/5547996813833?text=Ol%C3%A1%20Alessandro%2C%20vim%20pela%20landing%20da%20ALLKByte."
-              target="_blank"
-              rel="noopener"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-whatsapp text-background font-semibold hover:opacity-90 transition-all animate-pulse-glow"
-            >
-              <MessageCircle className="h-5 w-5" />
-              Falar no WhatsApp
-            </a>
-            <a
               href="#contato"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full glass font-semibold hover:border-primary/60 hover:text-primary transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-primary text-primary-foreground font-semibold hover:bg-primary-glow transition-colors animate-pulse-glow"
             >
               Solicitar orçamento
               <ArrowRight className="h-5 w-5" />
