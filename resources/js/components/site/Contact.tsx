@@ -4,7 +4,7 @@ import { MessageCircle, Mail, Linkedin, Instagram, Send, CheckCircle, AlertCircl
 type Status = "idle" | "loading" | "success" | "error";
 
 export const Contact = () => {
-  const [form, setForm] = useState({ nome: "", empresa: "", email: "", projeto: "" });
+  const [form, setForm] = useState({ nome: "", empresa: "", email: "", projeto: "", website: "" });
   const [status, setStatus] = useState<Status>("idle");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -24,7 +24,7 @@ export const Contact = () => {
       if (!res.ok) throw new Error();
 
       setStatus("success");
-      setForm({ nome: "", empresa: "", email: "", projeto: "" });
+      setForm({ nome: "", empresa: "", email: "", projeto: "", website: "" });
     } catch {
       setStatus("error");
     }
@@ -109,6 +109,17 @@ export const Contact = () => {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5">
+                {/* honeypot — invisível para humanos, bots preenchem */}
+                <input
+                  type="text"
+                  name="website"
+                  value={form.website}
+                  onChange={(e) => setForm({ ...form, website: e.target.value })}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", opacity: 0 }}
+                />
                 <div className="grid sm:grid-cols-2 gap-5">
                   <Field label="Nome" value={form.nome} onChange={(v) => setForm({ ...form, nome: v })} required />
                   <Field label="Empresa" value={form.empresa} onChange={(v) => setForm({ ...form, empresa: v })} />

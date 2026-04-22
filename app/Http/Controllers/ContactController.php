@@ -11,6 +11,10 @@ class ContactController extends Controller
 {
     public function send(Request $request): JsonResponse
     {
+        if ($request->filled('website')) {
+            return response()->json(['message' => 'Mensagem enviada com sucesso.']);
+        }
+
         $data = $request->validate([
             'nome'    => 'required|string|max:100',
             'empresa' => 'nullable|string|max:100',
