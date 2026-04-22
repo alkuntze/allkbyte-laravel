@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { MessageCircle, Mail, Linkedin, Instagram, Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 
-type Status = "idle" | "loading" | "success" | "error";
+type Status = "idle" | "loading" | "success" | "error" | "ratelimit";
 
 export const Contact = () => {
   const [form, setForm] = useState({ nome: "", empresa: "", email: "", projeto: "", website: "" });
@@ -21,7 +21,8 @@ export const Contact = () => {
         body: JSON.stringify(form),
       });
 
-      if (!res.ok) throw new Error();
+      if (res.status === 429) { setStatus("ratelimit"); return; }
+      if (!res.ok) throw new Error("server error");
 
       setStatus("success");
       setForm({ nome: "", empresa: "", email: "", projeto: "", website: "" });
@@ -149,6 +150,13 @@ export const Contact = () => {
                   <div className="flex items-center gap-2 text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded-xl px-4 py-3">
                     <AlertCircle className="h-4 w-4 shrink-0" />
                     Erro ao enviar. Tente novamente ou entre em contato diretamente.
+                  </div>
+                )}
+
+                {status === "ratelimit" && (
+                  <div className="flex items-center gap-2 text-sm text-yellow-400 bg-yellow-400/10 border border-yellow-400/20 rounded-xl px-4 py-3">
+                    <AlertCircle className="h-4 w-4 shrink-0" />
+                    Muitas tentativas. Aguarde alguns minutos antes de enviar novamente.
                   </div>
                 )}
 
