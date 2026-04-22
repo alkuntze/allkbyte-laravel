@@ -84,17 +84,16 @@ export const Contact = () => {
                 href="https://instagram.com/allkbyte"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group mt-2 flex items-center gap-4 p-4 rounded-xl glass hover:border-primary/60 transition-colors"
+                className="group mt-2 flex flex-col items-center gap-3 p-5 rounded-xl glass hover:border-primary/60 transition-colors"
               >
                 <img
                   src={qrInsta}
                   alt="QR Code Instagram @allkbyte"
-                  className="h-16 w-16 rounded-lg object-contain opacity-90 group-hover:opacity-100 transition-opacity"
+                  className="w-full max-w-[200px] rounded-xl object-contain opacity-90 group-hover:opacity-100 transition-opacity"
                 />
-                <div>
-                  <div className="text-xs text-muted-foreground">Siga no Instagram</div>
+                <div className="text-center">
                   <div className="font-medium">@allkbyte</div>
-                  <div className="text-xs text-muted-foreground mt-0.5">Aponte a câmera para o QR Code</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">Aponte a câmera para seguir no Instagram</div>
                 </div>
               </a>
             </div>
