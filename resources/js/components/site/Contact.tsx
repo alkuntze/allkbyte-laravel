@@ -47,21 +47,7 @@ export const Contact = () => {
             </p>
 
             <div className="mt-8 space-y-3">
-              <a
-                href="https://wa.me/5547996813833"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 p-4 rounded-xl glass hover:border-primary/60 transition-colors group"
-              >
-                <span className="h-10 w-10 rounded-lg bg-whatsapp/15 text-whatsapp flex items-center justify-center">
-                  <MessageCircle className="h-5 w-5" />
-                </span>
-                <div>
-                  <div className="text-xs text-muted-foreground">WhatsApp</div>
-                  <div className="font-medium">+55 47 99681-3833</div>
-                </div>
-              </a>
-              <a
+              <
                 href="mailto:contato@allkbyte.com.br"
                 className="flex items-center gap-3 p-4 rounded-xl glass hover:border-primary/60 transition-colors"
               >
