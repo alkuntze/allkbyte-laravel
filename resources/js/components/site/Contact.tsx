@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { MessageCircle, Mail, Linkedin, Instagram, Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { Mail, Linkedin, Instagram, Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import qrInsta from "@/assets/allkbyte_qr_insta.png";
 
 type Status = "idle" | "loading" | "success" | "error" | "ratelimit";
 
@@ -92,6 +93,24 @@ export const Contact = () => {
                   <Instagram className="h-5 w-5" />
                 </a>
               </div>
+
+              <a
+                href="https://instagram.com/allkbyte"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group mt-2 flex items-center gap-4 p-4 rounded-xl glass hover:border-primary/60 transition-colors"
+              >
+                <img
+                  src={qrInsta}
+                  alt="QR Code Instagram @allkbyte"
+                  className="h-16 w-16 rounded-lg object-contain opacity-90 group-hover:opacity-100 transition-opacity"
+                />
+                <div>
+                  <div className="text-xs text-muted-foreground">Siga no Instagram</div>
+                  <div className="font-medium">@allkbyte</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">Aponte a câmera para o QR Code</div>
+                </div>
+              </a>
             </div>
           </div>
 
