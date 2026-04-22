@@ -47,7 +47,7 @@ export const Contact = () => {
             </p>
 
             <div className="mt-8 space-y-3">
-              <
+              <a
                 href="mailto:contato@allkbyte.com.br"
                 className="flex items-center gap-3 p-4 rounded-xl glass hover:border-primary/60 transition-colors"
               >
