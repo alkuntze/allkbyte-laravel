@@ -33,3 +33,4 @@ phpunit.xml
 Dockerfile
 .dockerignore
 README.md
+CLAUDE.md
