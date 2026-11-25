@@ -17,7 +17,10 @@
     <meta property="og:description" content="Backend sênior PHP/Laravel. Integrações com APIs e web scraping de alta resiliência. Disponível para projetos PJ." />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <meta name="contact-webhook-url" content="{{ config('services.n8n.contact_webhook_url') }}" />
+    <meta name="turnstile-site-key" content="{{ config('services.turnstile.site_key') }}" />
+    <link rel="preconnect" href="https://challenges.cloudflare.com" />
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
     @vite(['resources/css/app.css', 'resources/js/main.tsx'])
   </head>
   <body>

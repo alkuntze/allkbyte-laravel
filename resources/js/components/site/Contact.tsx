@@ -1,33 +1,122 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Mail, Linkedin, Instagram, Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 
 type Status = "idle" | "loading" | "success" | "error" | "ratelimit";
 
+type Turnstile = {
+  render: (el: HTMLElement, opts: Record<string, unknown>) => string;
+  reset: (id: string) => void;
+  remove: (id: string) => void;
+};
+
+declare global {
+  interface Window {
+    turnstile?: Turnstile;
+  }
+}
+
+// Configuração injetada pelo Laravel em app.blade.php (variáveis de ambiente)
+const meta = (name: string) =>
+  (document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement | null)?.content ?? "";
+const WEBHOOK_URL = meta("contact-webhook-url");
+const TURNSTILE_SITE_KEY = meta("turnstile-site-key");
+
+const FORM_VAZIO = { nome: "", empresa: "", email: "", projeto: "", website: "" };
+const ERRO_PADRAO = "Erro ao enviar. Tente novamente ou entre em contato diretamente.";
+
 export const Contact = () => {
-  const [form, setForm] = useState({ nome: "", empresa: "", email: "", projeto: "", website: "" });
+  const [form, setForm] = useState(FORM_VAZIO);
   const [status, setStatus] = useState<Status>("idle");
+  const [erro, setErro] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const turnstileRef = useRef<HTMLDivElement>(null);
+  const widgetId = useRef<string | null>(null);
+  // Momento em que o formulário foi exibido (o n8n exige tempo mínimo de preenchimento)
+  const abertoEm = useRef(Date.now());
+
+  const formVisivel = status !== "success";
+
+  // Renderiza o widget do Cloudflare Turnstile (o script carrega de forma assíncrona)
+  useEffect(() => {
+    if (!formVisivel || !TURNSTILE_SITE_KEY) return;
+    abertoEm.current = Date.now();
+
+    let cancelado = false;
+    const tentar = () => {
+      if (cancelado) return;
+      if (!window.turnstile || !turnstileRef.current) {
+        setTimeout(tentar, 100);
+        return;
+      }
+      widgetId.current = window.turnstile.render(turnstileRef.current, {
+        sitekey: TURNSTILE_SITE_KEY,
+        language: "pt-br",
+        theme: "dark",
+        callback: (token: string) => setTurnstileToken(token),
+        "expired-callback": () => setTurnstileToken(""),
+        "error-callback": () => setTurnstileToken(""),
+      });
+    };
+    tentar();
+
+    return () => {
+      cancelado = true;
+      if (widgetId.current && window.turnstile) window.turnstile.remove(widgetId.current);
+      widgetId.current = null;
+      setTurnstileToken("");
+    };
+  }, [formVisivel]);
+
+  // O token do Turnstile só vale para um envio
+  const resetarTurnstile = () => {
+    setTurnstileToken("");
+    if (widgetId.current && window.turnstile) window.turnstile.reset(widgetId.current);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!WEBHOOK_URL) {
+      setErro(ERRO_PADRAO);
+      setStatus("error");
+      return;
+    }
+    if (!turnstileToken) {
+      setErro("Confirme que você não é um robô.");
+      setStatus("error");
+      return;
+    }
+
     setStatus("loading");
 
+    // form-urlencoded evita o preflight CORS; o n8n converte para body.*
+    const body = new URLSearchParams({
+      nome: form.nome,
+      email: form.email,
+      assunto: form.empresa,
+      mensagem: form.projeto,
+      website: form.website,
+      _ts: String(abertoEm.current),
+      "cf-turnstile-response": turnstileToken,
+    });
+
     try {
-      const res = await fetch("/contato", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRF-TOKEN": (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ?? "",
-        },
-        body: JSON.stringify(form),
-      });
+      const res = await fetch(WEBHOOK_URL, { method: "POST", body });
+      const data = await res.json().catch(() => ({}));
 
-      if (res.status === 429) { setStatus("ratelimit"); return; }
-      if (!res.ok) throw new Error("server error");
+      if (res.ok && data.ok !== false) {
+        setStatus("success");
+        setForm(FORM_VAZIO);
+        return;
+      }
 
-      setStatus("success");
-      setForm({ nome: "", empresa: "", email: "", projeto: "", website: "" });
+      setErro(data.mensagem || ERRO_PADRAO);
+      setStatus(res.status === 429 ? "ratelimit" : "error");
+      resetarTurnstile();
     } catch {
+      setErro(ERRO_PADRAO);
       setStatus("error");
+      resetarTurnstile();
     }
   };
 
@@ -109,8 +198,8 @@ export const Contact = () => {
                   style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", opacity: 0 }}
                 />
                 <div className="grid sm:grid-cols-2 gap-5">
-                  <Field label="Nome" value={form.nome} onChange={(v) => setForm({ ...form, nome: v })} required />
-                  <Field label="Empresa" value={form.empresa} onChange={(v) => setForm({ ...form, empresa: v })} />
+                  <Field label="Nome" value={form.nome} onChange={(v) => setForm({ ...form, nome: v })} required minLength={2} maxLength={100} />
+                  <Field label="Empresa" value={form.empresa} onChange={(v) => setForm({ ...form, empresa: v })} maxLength={150} />
                 </div>
                 <Field
                   label="E-mail"
@@ -118,6 +207,7 @@ export const Contact = () => {
                   value={form.email}
                   onChange={(v) => setForm({ ...form, email: v })}
                   required
+                  maxLength={150}
                 />
                 <div>
                   <label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
@@ -125,6 +215,8 @@ export const Contact = () => {
                   </label>
                   <textarea
                     required
+                    minLength={10}
+                    maxLength={3000}
                     rows={5}
                     value={form.projeto}
                     onChange={(e) => setForm({ ...form, projeto: e.target.value })}
@@ -133,17 +225,19 @@ export const Contact = () => {
                   />
                 </div>
 
+                <div ref={turnstileRef} className="min-h-[65px]" />
+
                 {status === "error" && (
                   <div className="flex items-center gap-2 text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded-xl px-4 py-3">
                     <AlertCircle className="h-4 w-4 shrink-0" />
-                    Erro ao enviar. Tente novamente ou entre em contato diretamente.
+                    {erro}
                   </div>
                 )}
 
                 {status === "ratelimit" && (
                   <div className="flex items-center gap-2 text-sm text-yellow-400 bg-yellow-400/10 border border-yellow-400/20 rounded-xl px-4 py-3">
                     <AlertCircle className="h-4 w-4 shrink-0" />
-                    Muitas tentativas. Aguarde alguns minutos antes de enviar novamente.
+                    {erro || "Muitas tentativas. Aguarde alguns minutos antes de enviar novamente."}
                   </div>
                 )}
 
@@ -179,18 +273,24 @@ const Field = ({
   value,
   onChange,
   required,
+  minLength,
+  maxLength,
 }: {
   label: string;
   type?: string;
   value: string;
   onChange: (v: string) => void;
   required?: boolean;
+  minLength?: number;
+  maxLength?: number;
 }) => (
   <div>
     <label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">{label}</label>
     <input
       type={type}
       required={required}
+      minLength={minLength}
+      maxLength={maxLength}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       className="mt-2 w-full rounded-xl bg-background/60 border border-border px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/30 transition-all"
