@@ -186,11 +186,11 @@ export const Contact = () => {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5">
-                {/* honeypot — invisível para humanos, bots preenchem.
-                    O name NÃO pode ser reconhecível (ex.: "website", "url", "company"): o autofill do
-                    navegador/gerenciador de senhas preencheria o campo e o envio cairia no honeypot do n8n.
-                    O valor é enviado ao n8n com a chave "website". */}
-                <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", overflow: "hidden" }}>
+                {/* honeypot — invisível para humanos, bots preenchem. O valor vai ao n8n com a chave "website".
+                    Precisa ser display:none: o autofill de endereços do Chrome ignora autocomplete="off"
+                    e preenche campos posicionados fora da tela, mas não preenche campos invisíveis.
+                    O name também não pode ser reconhecível (ex.: "website", "url", "company"). */}
+                <div aria-hidden="true" style={{ display: "none" }}>
                   <input
                     type="text"
                     name="hp_x7q2"
