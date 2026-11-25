@@ -186,17 +186,24 @@ export const Contact = () => {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5">
-                {/* honeypot — invisível para humanos, bots preenchem */}
-                <input
-                  type="text"
-                  name="website"
-                  value={form.website}
-                  onChange={(e) => setForm({ ...form, website: e.target.value })}
-                  tabIndex={-1}
-                  autoComplete="off"
-                  aria-hidden="true"
-                  style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", opacity: 0 }}
-                />
+                {/* honeypot — invisível para humanos, bots preenchem.
+                    O name NÃO pode ser reconhecível (ex.: "website", "url", "company"): o autofill do
+                    navegador/gerenciador de senhas preencheria o campo e o envio cairia no honeypot do n8n.
+                    O valor é enviado ao n8n com a chave "website". */}
+                <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", overflow: "hidden" }}>
+                  <input
+                    type="text"
+                    name="hp_x7q2"
+                    value={form.website}
+                    onChange={(e) => setForm({ ...form, website: e.target.value })}
+                    tabIndex={-1}
+                    autoComplete="off"
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-bwignore="true"
+                    data-form-type="other"
+                  />
+                </div>
                 <div className="grid sm:grid-cols-2 gap-5">
                   <Field label="Nome" value={form.nome} onChange={(v) => setForm({ ...form, nome: v })} required minLength={2} maxLength={100} />
                   <Field label="Empresa" value={form.empresa} onChange={(v) => setForm({ ...form, empresa: v })} maxLength={150} />
